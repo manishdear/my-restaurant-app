@@ -9,9 +9,7 @@
         android:id="@+id/nav_home"
         android:name="com.unofficialcoder.myrestaurantapp.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" >
-        <action android:id="@+id/action_nav_home_to_nav_share" />
-    </fragment>
+        tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -42,4 +40,5 @@
         android:name="com.unofficialcoder.myrestaurantapp.ui.send.SendFragment"
         android:label="@string/menu_send"
         tools:layout="@layout/fragment_send" />
+
 </navigation>
