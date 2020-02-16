@@ -5,15 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    android:background="@color/com_accountkit_whatsapp_disable_background"
     android:orientation="vertical"
     tools:context=".HomeActivity"
     tools:showIn="@layout/app_bar_home">
-
-   <ss.com.bannerslider.Slider
-       android:id="@+id/banner_slider"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -32,7 +26,15 @@
 
     </LinearLayout>
 
+    <ss.com.bannerslider.Slider
+        android:id="@+id/banner_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:id="@+id/recycler_restaurant"
         android:layout_below="@+id/banner_slider"
         android:layout_width="match_parent"

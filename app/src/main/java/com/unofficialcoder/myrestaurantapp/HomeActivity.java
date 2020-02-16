@@ -1,46 +1,75 @@
 package com.unofficialcoder.myrestaurantapp;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+import com.unofficialcoder.myrestaurantapp.adapter.RestaurantAdapter;
+import com.unofficialcoder.myrestaurantapp.adapter.RestaurantSliderAdapter;
+import com.unofficialcoder.myrestaurantapp.model.RestaurantBean;
+import com.unofficialcoder.myrestaurantapp.services.PicassoImageLoaderService;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.Menu;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import ss.com.bannerslider.Slider;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private AppBarConfiguration mAppBarConfiguration;
+    private static final String TAG = "HomeActivity";
+
+    private List<RestaurantBean> restaurantBeanList;
+    private RestaurantAdapter restaurantAdapter;
 
     private TextView textUserName, textUserPhone;
 
     private DrawerLayout drawer;
 
+    //@BindView(R.id.banner_slider)
+    Slider banner_slider;
+    //@BindView(R.id.com_accountkit_resend_button)
+    RecyclerView recycler_restaurant;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        //ButterKnife.bind(HomeActivity.this);
+        banner_slider = findViewById(R.id.banner_slider);
+        recycler_restaurant = findViewById(R.id.recycler_restaurant);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -55,7 +84,79 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         textUserName.setText("ManishDear");
         textUserPhone.setText("9111775017");
 
+        initViews();
+        loadRestaurant();
+
     }
+
+    private void initViews() {
+
+        Slider.init(new PicassoImageLoaderService());
+
+        restaurantBeanList = new ArrayList<>();
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recycler_restaurant.setLayoutManager(layoutManager);
+        recycler_restaurant.addItemDecoration(new DividerItemDecoration(this, layoutManager.getOrientation()    ));
+        restaurantAdapter = new RestaurantAdapter(HomeActivity.this, restaurantBeanList);
+        recycler_restaurant.setAdapter(restaurantAdapter);
+
+        displayBanner();
+    }
+
+
+    private void loadRestaurant(){
+        StringRequest otpRequest = new StringRequest(Request.Method.GET, "https://myresproject.herokuapp.com/restaurant?key=1234", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "onResponse: "+ response);
+                try {
+                    JSONObject rootObject = new JSONObject(response);
+                    if (rootObject.getBoolean("success")){
+                        JSONArray resultArray = rootObject.getJSONArray("result");
+                        if (resultArray.length() != 0){
+                            for (int i = 0; i < resultArray.length(); i++) {
+                                JSONObject resultObject = resultArray.getJSONObject(i);
+                                RestaurantBean restaurant = new RestaurantBean();
+                                restaurant.setId(resultObject.getString("id"));
+                                restaurant.setName(resultObject.getString("name"));
+                                restaurant.setAddress(resultObject.getString("address"));
+                                restaurant.setPhone(resultObject.getString("phone"));
+                                restaurant.setLat(resultObject.getString("lat"));
+                                restaurant.setLng(resultObject.getString("lng"));
+                                restaurant.setUserOwner(resultObject.getString("userOwner"));
+                                restaurant.setImage(resultObject.getString("image"));
+                                restaurant.setPaymentUrl(resultObject.getString("paymentUrl"));
+                                restaurantBeanList.add(restaurant);
+                            }
+                            restaurantAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+                }catch (Exception e){
+                    Log.e(TAG, "onResponse: "+e.toString() );
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                MyUtils.showVolleyError(error, TAG, HomeActivity.this);
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                return params;
+            }
+        };
+        otpRequest.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
+        MyApplication.mRequestQue.add(otpRequest);
+    }
+
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -99,5 +200,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void displayBanner(){
+        banner_slider.setAdapter(new RestaurantSliderAdapter(restaurantBeanList));
     }
 }
