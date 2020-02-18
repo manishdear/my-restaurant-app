@@ -3,13 +3,13 @@ package com.unofficialcoder.myrestaurantapp.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -17,18 +17,15 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.nex3z.notificationbadge.NotificationBadge;
-import com.squareup.picasso.Picasso;
-import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
+import com.bumptech.glide.Glide;
 import com.unofficialcoder.myrestaurantapp.MyApplication;
-import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
 import com.unofficialcoder.myrestaurantapp.R;
-import com.unofficialcoder.myrestaurantapp.adapter.MyCategoryAdapter;
-import com.unofficialcoder.myrestaurantapp.common.Common;
+import com.unofficialcoder.myrestaurantapp.adapter.MyFoodAdapter;
+import com.unofficialcoder.myrestaurantapp.model.FoodBean;
 import com.unofficialcoder.myrestaurantapp.model.MenuBean;
-import com.unofficialcoder.myrestaurantapp.model.eventBus.MenuItemEvent;
-import com.unofficialcoder.myrestaurantapp.utils.SpaceItemDecoration;
+import com.unofficialcoder.myrestaurantapp.model.eventBus.FoodListEvent;
+import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
+import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -39,65 +36,40 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuActivity extends AppCompatActivity {
+public class FoodListActivity extends AppCompatActivity {
 
-    private static final String TAG = "MenuActivity";
+    private static final String TAG = "FoodListActivity";
 
-    private ImageView img_restaurant;
-    private RecyclerView recycler_category;
-    private NotificationBadge badge;
+    ImageView img_category;
+    RecyclerView recycler_foot_list;
     Toolbar toolbar;
-    FloatingActionButton btn_cart;
 
-    MyCategoryAdapter adapter;
-    List<MenuBean> categoryList;
+    MyFoodAdapter adapter;
+
+    List<FoodBean> foodBeanList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_menu);
+        setContentView(R.layout.activity_food_list);
 
         initViews();
-
     }
 
     private void initViews() {
-        img_restaurant = findViewById(R.id.img_restaurant);
-        recycler_category = findViewById(R.id.recycler_category);
-        badge = findViewById(R.id.badge);
+
+        foodBeanList = new ArrayList<>();
+
         toolbar = findViewById(R.id.toolbar);
-        btn_cart = findViewById(R.id.fab);
+        img_category = findViewById(R.id.img_category);
+        recycler_foot_list = findViewById(R.id.recycler_foot_list);
 
-        btn_cart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //
-            }
-        });
+        LinearLayoutManager layoutManager = new LinearLayoutManager(FoodListActivity.this, RecyclerView.VERTICAL, false);
+        recycler_foot_list.setLayoutManager(layoutManager);
+        recycler_foot_list.addItemDecoration(new DividerItemDecoration(FoodListActivity.this,layoutManager.getOrientation() ));
 
-
-        categoryList = new ArrayList<>();
-        adapter = new MyCategoryAdapter(MenuActivity.this, categoryList);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                if (adapter !=  null){
-                    switch (adapter.getItemViewType(position)){
-                        case Common
-                                .DEFAULT_COLUMN_COUNT: return 1;
-                        case Common.FULL_WIDTH_COLUMN: return 2;
-                        default: return  -1;
-                    }
-                }else {
-                    return -1;
-                }
-            }
-        });
-
-        recycler_category.setLayoutManager(layoutManager);
-        recycler_category.addItemDecoration(new SpaceItemDecoration(8));
-        recycler_category.setAdapter(adapter);
+        adapter = new MyFoodAdapter(FoodListActivity.this, foodBeanList);
+        recycler_foot_list.setAdapter(adapter);
     }
 
     @Override
@@ -124,26 +96,28 @@ public class MenuActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void loadMenuByRestaurant(MenuItemEvent event){
+    public void loadFoodListByCategory(FoodListEvent event){
 
         if (event.isSuccess()){
-            Picasso.get().load(APIEndPoints.DEMO_IMAGE_SERVER_URL + "12_curry_mee.jpg").into(img_restaurant);
-            toolbar.setTitle(event.getRestaurant().getName());
+            Glide.with(FoodListActivity.this)
+                    .load(APIEndPoints.DEMO_IMAGE_SERVER_URL + event.getCategory().getImage())
+                    .into(img_category);
+            toolbar.setTitle(event.getCategory().getName());
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            adapter.notifyDataSetChanged();
 
-            loadMenu(event.getRestaurant().getId());
+            loadMenu(event.getCategory().getId());
 
-        }else {
+        }else{
 
         }
     }
 
     private void loadMenu(String id){
-        StringRequest otpRequest = new StringRequest(Request.Method.GET, APIEndPoints.GET_MENU_BY_RESTAURANT_ID+id, new Response.Listener<String>() {
+        StringRequest otpRequest = new StringRequest(Request.Method.GET, APIEndPoints.GET_FOOD_BY_MENU_ID+id, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, "onResponse: "+ response);
@@ -154,13 +128,17 @@ public class MenuActivity extends AppCompatActivity {
                         if (resultArray.length() != 0){
                             for (int i = 0; i < resultArray.length(); i++) {
                                 JSONObject resultObject = resultArray.getJSONObject(i);
-                                MenuBean bean = new MenuBean();
+                                FoodBean bean = new FoodBean();
                                 bean.setId(resultObject.getString("id"));
                                 bean.setName(resultObject.getString("name"));
                                 bean.setDescription(resultObject.getString("description"));
                                 bean.setImage(resultObject.getString("image"));
+                                bean.setPrice(resultObject.getString("price"));
+                                bean.setIsSize(resultObject.getString("isSize"));
+                                bean.setIsAddon(resultObject.getString("isAddon"));
+                                bean.setDiscount(resultObject.getString("discount"));
 
-                                categoryList.add(bean);
+                                foodBeanList.add(bean);
                             }
                             adapter.notifyDataSetChanged();
                         }
@@ -176,7 +154,7 @@ public class MenuActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                MyUtils.showVolleyError(error, TAG, MenuActivity.this);
+                MyUtils.showVolleyError(error, TAG, FoodListActivity.this);
             }
         }){
 //            @Override

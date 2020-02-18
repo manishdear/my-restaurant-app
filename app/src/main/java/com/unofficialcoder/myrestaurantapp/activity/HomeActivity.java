@@ -104,8 +104,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-
-
     private void loadRestaurant(){
         StringRequest otpRequest = new StringRequest(Request.Method.GET, "https://myresproject.herokuapp.com/restaurant?key=1234", new Response.Listener<String>() {
             @Override
@@ -206,6 +204,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void displayBanner(){
-        banner_slider.setAdapter(new RestaurantSliderAdapter(restaurantBeanList));
+        banner_slider.setAdapter(new RestaurantSliderAdapter(restaurantBeanList, HomeActivity.this));
     }
 }
