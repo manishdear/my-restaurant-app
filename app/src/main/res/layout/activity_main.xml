@@ -10,7 +10,7 @@
     app:alignContent="stretch"
     app:justifyContent="center"
     android:background="@android:color/white"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
     <LinearLayout
         android:orientation="vertical"

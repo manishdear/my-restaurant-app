@@ -1,4 +1,4 @@
-package com.unofficialcoder.myrestaurantapp;
+package com.unofficialcoder.myrestaurantapp.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;

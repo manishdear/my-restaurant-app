@@ -1,4 +1,4 @@
-package com.unofficialcoder.myrestaurantapp;
+package com.unofficialcoder.myrestaurantapp.utils;
 
 import android.app.DownloadManager;
 import android.content.ContentUris;
@@ -34,6 +34,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.VolleyError;
+import com.unofficialcoder.myrestaurantapp.MyApplication;
+import com.unofficialcoder.myrestaurantapp.R;
 import com.unofficialcoder.myrestaurantapp.network.MyVolley;
 
 import org.json.JSONArray;

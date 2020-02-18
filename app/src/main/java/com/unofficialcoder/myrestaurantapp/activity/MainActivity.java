@@ -1,8 +1,10 @@
-package com.unofficialcoder.myrestaurantapp;
+package com.unofficialcoder.myrestaurantapp.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.unofficialcoder.myrestaurantapp.R;
 
 public class MainActivity extends AppCompatActivity {
 

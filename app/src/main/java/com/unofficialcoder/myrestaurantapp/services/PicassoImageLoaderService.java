@@ -2,6 +2,7 @@ package com.unofficialcoder.myrestaurantapp.services;
 
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import ss.com.bannerslider.ImageLoadingService;

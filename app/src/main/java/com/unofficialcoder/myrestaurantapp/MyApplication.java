@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.android.volley.RequestQueue;
 import com.unofficialcoder.myrestaurantapp.network.MyVolley;
+import com.unofficialcoder.myrestaurantapp.storage.MySharedPreferences;
 
 import net.gotev.uploadservice.UploadService;
 

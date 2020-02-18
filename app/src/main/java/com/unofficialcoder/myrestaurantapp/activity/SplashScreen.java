@@ -1,4 +1,4 @@
-package com.unofficialcoder.myrestaurantapp;
+package com.unofficialcoder.myrestaurantapp.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 

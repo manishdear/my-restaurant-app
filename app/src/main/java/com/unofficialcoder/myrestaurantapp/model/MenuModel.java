@@ -2,10 +2,11 @@ package com.unofficialcoder.myrestaurantapp.model;
 
 import java.util.List;
 
-public class RestaurantModel {
+public class MenuModel {
+
     private boolean success;
     private String message;
-    private List<RestaurantBean> result;
+    private List<Category> result;
 
     public boolean isSuccess() {
         return success;
@@ -23,11 +24,11 @@ public class RestaurantModel {
         this.message = message;
     }
 
-    public List<RestaurantBean> getResult() {
+    public List<Category> getResult() {
         return result;
     }
 
-    public void setResult(List<RestaurantBean> result) {
+    public void setResult(List<Category> result) {
         this.result = result;
     }
 }

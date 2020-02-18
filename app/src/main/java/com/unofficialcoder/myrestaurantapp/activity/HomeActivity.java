@@ -1,4 +1,4 @@
-package com.unofficialcoder.myrestaurantapp;
+package com.unofficialcoder.myrestaurantapp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,9 +16,11 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
-import androidx.navigation.ui.AppBarConfiguration;
 
 import com.google.android.material.navigation.NavigationView;
+import com.unofficialcoder.myrestaurantapp.MyApplication;
+import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
+import com.unofficialcoder.myrestaurantapp.R;
 import com.unofficialcoder.myrestaurantapp.adapter.RestaurantAdapter;
 import com.unofficialcoder.myrestaurantapp.adapter.RestaurantSliderAdapter;
 import com.unofficialcoder.myrestaurantapp.model.RestaurantBean;
@@ -42,8 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import ss.com.bannerslider.Slider;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -87,6 +87,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         initViews();
         loadRestaurant();
 
+
     }
 
     private void initViews() {
@@ -100,8 +101,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         restaurantAdapter = new RestaurantAdapter(HomeActivity.this, restaurantBeanList);
         recycler_restaurant.setAdapter(restaurantAdapter);
 
-        displayBanner();
+
     }
+
 
 
     private void loadRestaurant(){
@@ -129,6 +131,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                 restaurantBeanList.add(restaurant);
                             }
                             restaurantAdapter.notifyDataSetChanged();
+                            displayBanner();
                         }
                     }
 

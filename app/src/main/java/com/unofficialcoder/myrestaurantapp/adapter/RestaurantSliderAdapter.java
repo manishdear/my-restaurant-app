@@ -1,6 +1,6 @@
 package com.unofficialcoder.myrestaurantapp.adapter;
 
-import com.unofficialcoder.myrestaurantapp.R;
+import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.model.RestaurantBean;
 
 import java.util.List;
@@ -18,11 +18,11 @@ public class RestaurantSliderAdapter extends SliderAdapter {
 
     @Override
     public int getItemCount() {
-        return 10;
+        return restaurantBeanList.size();
     }
 
     @Override
     public void onBindImageSlide(int position, ImageSlideViewHolder imageSlideViewHolder) {
-        imageSlideViewHolder.bindImageSlide(R.drawable.restaurant_b);
+        imageSlideViewHolder.bindImageSlide(APIEndPoints.DEMO_IMAGE_SERVER_URL + restaurantBeanList.get(position).getImage());
     }
 }
