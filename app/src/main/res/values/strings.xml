@@ -22,5 +22,6 @@
     <string name="nearby_restaurant">Nearby Restaurant</string>
     <string name="order_history">Order History</string>
     <string name="update_info">Update Info</string>
+    <string name="favorite">Favorite</string>
 
 </resources>

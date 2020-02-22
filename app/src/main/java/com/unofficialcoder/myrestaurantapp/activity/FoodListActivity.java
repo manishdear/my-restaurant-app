@@ -2,15 +2,21 @@ package com.unofficialcoder.myrestaurantapp.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
+
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -22,7 +28,6 @@ import com.unofficialcoder.myrestaurantapp.MyApplication;
 import com.unofficialcoder.myrestaurantapp.R;
 import com.unofficialcoder.myrestaurantapp.adapter.MyFoodAdapter;
 import com.unofficialcoder.myrestaurantapp.model.FoodBean;
-import com.unofficialcoder.myrestaurantapp.model.MenuBean;
 import com.unofficialcoder.myrestaurantapp.model.eventBus.FoodListEvent;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
@@ -44,9 +49,8 @@ public class FoodListActivity extends AppCompatActivity {
     RecyclerView recycler_foot_list;
     Toolbar toolbar;
 
-    MyFoodAdapter adapter;
-
-    List<FoodBean> foodBeanList;
+    MyFoodAdapter adapter, searchAdapter;
+    List<FoodBean> foodBeanList, searchFoodList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class FoodListActivity extends AppCompatActivity {
     private void initViews() {
 
         foodBeanList = new ArrayList<>();
+        searchFoodList = new ArrayList<>();
 
         toolbar = findViewById(R.id.toolbar);
         img_category = findViewById(R.id.img_category);
@@ -70,6 +75,8 @@ public class FoodListActivity extends AppCompatActivity {
 
         adapter = new MyFoodAdapter(FoodListActivity.this, foodBeanList);
         recycler_foot_list.setAdapter(adapter);
+        searchAdapter = new MyFoodAdapter(FoodListActivity.this, searchFoodList);
+
     }
 
     @Override
@@ -96,6 +103,65 @@ public class FoodListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+
+        if (adapter != null){
+            adapter.onStop();
+        }
+        if (searchAdapter != null){
+            //searchAdapter.onStop();
+        }
+
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search,menu);
+
+        MenuItem menuItem = menu.findItem(R.id.search);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView)menuItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        //Event
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                startSearchFood(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        menuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                //Restore to original adapter when user close search
+                recycler_foot_list.setAdapter(adapter);
+                return true;
+            }
+        });
+
+        return true;
+    }
+
+    private void startSearchFood(String query) {
+        //dialog.show;
+        searchFoodList.clear();
+        searchFood(query);
+    }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void loadFoodListByCategory(FoodListEvent event){
@@ -109,7 +175,10 @@ public class FoodListActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-            loadMenu(event.getCategory().getId());
+            if (foodBeanList.size() == 0){
+
+                loadMenu(event.getCategory().getId());
+            }
 
         }else{
 
@@ -171,5 +240,55 @@ public class FoodListActivity extends AppCompatActivity {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
         MyApplication.mRequestQue.add(otpRequest);
+    }
+
+    private void searchFood(String name){
+        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.SEARCH_FOOD+name, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "onResponse: "+ response);
+                try {
+                    JSONObject rootObject = new JSONObject(response);
+                    if (rootObject.getBoolean("success")){
+                        JSONArray resultArray = rootObject.getJSONArray("result");
+                        if (resultArray.length() != 0){
+                            for (int i = 0; i < resultArray.length(); i++) {
+                                JSONObject resultObject = resultArray.getJSONObject(i);
+                                FoodBean bean = new FoodBean();
+                                bean.setId(resultObject.getString("id"));
+                                bean.setName(resultObject.getString("name"));
+                                bean.setDescription(resultObject.getString("description"));
+                                bean.setImage(resultObject.getString("image"));
+                                bean.setPrice(resultObject.getString("price"));
+                                bean.setIsSize(resultObject.getString("isSize"));
+                                bean.setIsAddon(resultObject.getString("isAddon"));
+                                bean.setDiscount(resultObject.getString("discount"));
+
+                                searchFoodList.add(bean);
+                            }
+                            recycler_foot_list.setAdapter(searchAdapter);
+                            searchAdapter.notifyDataSetChanged();
+                        }
+                    }else{
+                        //
+                    }
+
+                }catch (Exception e){
+                    Log.e(TAG, "onResponse: "+e.toString() );
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                MyUtils.showVolleyError(error, TAG, FoodListActivity.this);
+            }
+        });
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
+        MyApplication.mRequestQue.add(request);
     }
 }

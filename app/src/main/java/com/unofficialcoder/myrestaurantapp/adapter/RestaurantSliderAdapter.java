@@ -27,6 +27,6 @@ public class RestaurantSliderAdapter extends SliderAdapter {
 
     @Override
     public void onBindImageSlide(int position, ImageSlideViewHolder imageSlideViewHolder) {
-        //imageSlideViewHolder.bindImageSlide(APIEndPoints.DEMO_IMAGE_SERVER_URL + restaurantBeanList.get(position).getImage());
+        imageSlideViewHolder.bindImageSlide(APIEndPoints.DEMO_IMAGE_SERVER_URL + restaurantBeanList.get(position).getImage());
     }
 }

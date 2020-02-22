@@ -48,7 +48,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.My
         holder.restaurantAddress.setText(bean.getAddress());
         Glide.with(context)
                 .load(APIEndPoints.DEMO_IMAGE_SERVER_URL + bean.getImage())
-                .placeholder(R.drawable.restaurant_d)
                 .into(holder.coverImg);
 
 

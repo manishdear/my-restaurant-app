@@ -52,7 +52,7 @@ public class MyCategoryAdapter extends RecyclerView.Adapter<MyCategoryAdapter.My
         MenuBean bean = categoryList.get(position);
 
         Picasso.get()
-                .load(APIEndPoints.DEMO_IMAGE_SERVER_URL + bean.getImage())
+                .load(APIEndPoints.DEMO_IMAGE_SERVER_URL + bean.getImage() )
                 .into(holder.imgCategory);
 
         holder.textCategory.setText(bean.getName());

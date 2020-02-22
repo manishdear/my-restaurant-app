@@ -85,7 +85,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         textUserPhone.setText("9111775017");
 
         initViews();
-        loadRestaurant();
+        if (restaurantBeanList.size() == 0){
+
+            loadRestaurant();
+        }
 
 
     }
@@ -171,6 +174,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_log_out:
                 signOut();
+                break;
+            case R.id.nav_fav:
+                startActivity(new Intent(HomeActivity.this, FavoriteActivity.class));
                 break;
 
         }

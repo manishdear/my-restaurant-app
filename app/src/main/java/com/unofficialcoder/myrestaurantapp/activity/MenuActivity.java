@@ -135,7 +135,10 @@ public class MenuActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             adapter.notifyDataSetChanged();
 
-            loadMenu(event.getRestaurant().getId());
+            if (categoryList.size() == 0){
+
+                loadMenu(event.getRestaurant().getId());
+            }
 
         }else {
 

@@ -80,6 +80,8 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
         return foodList.size();
     }
 
+    public void onStop() {
+    }
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

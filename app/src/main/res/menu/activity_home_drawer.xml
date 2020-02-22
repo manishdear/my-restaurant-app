@@ -13,6 +13,14 @@
 
     <group >
         <item
+            android:id="@+id/nav_fav"
+            android:icon="@drawable/ic_favorite_grey_24dp"
+            android:title="@string/favorite" />
+
+    </group>
+
+    <group >
+        <item
             android:id="@+id/nav_order_history"
             android:icon="@drawable/ic_history_gray_24dp"
             android:title="@string/order_history" />
