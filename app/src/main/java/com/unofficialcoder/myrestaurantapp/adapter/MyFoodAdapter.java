@@ -1,7 +1,6 @@
 package com.unofficialcoder.myrestaurantapp.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +11,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.unofficialcoder.myrestaurantapp.R;
-import com.unofficialcoder.myrestaurantapp.activity.FoodListActivity;
-import com.unofficialcoder.myrestaurantapp.common.Common;
 import com.unofficialcoder.myrestaurantapp.interfaces.FoodDetailOrCardClickListener;
 import com.unofficialcoder.myrestaurantapp.model.FoodBean;
-import com.unofficialcoder.myrestaurantapp.model.MenuBean;
-import com.unofficialcoder.myrestaurantapp.model.eventBus.FoodListEvent;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.List;
-
-import butterknife.Unbinder;
 
 public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHolder> {
 
@@ -43,7 +33,7 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context)
-                .inflate(R.layout.layout_food, parent, false);
+                .inflate(R.layout.layout_food_item, parent, false);
 
         return new MyViewHolder(itemView);
     }
