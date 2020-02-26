@@ -20,6 +20,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nex3z.notificationbadge.NotificationBadge;
 import com.squareup.picasso.Picasso;
+import com.unofficialcoder.myrestaurantapp.model.FavoriteOnlyId;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.MyApplication;
 import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
@@ -59,6 +60,48 @@ public class MenuActivity extends AppCompatActivity {
 
         initViews();
 
+        loadFavoriteByRestaurant();
+    }
+
+    private void loadFavoriteByRestaurant() {
+        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FAV_BY_RESTAURANT, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "onResponse: "+ response);
+                try {
+                    JSONObject rootObject = new JSONObject(response);
+                    if (rootObject.getBoolean("success")){
+                        Common.currentFavRestaurant = new ArrayList<>();
+                        JSONArray resultArray = rootObject.getJSONArray("result");
+                        if (resultArray.length() != 0){
+                            for (int i = 0; i < resultArray.length(); i++) {
+                                JSONObject favObject = resultArray.getJSONObject(i);
+                                FavoriteOnlyId fav = new FavoriteOnlyId();
+                                fav.setFoodId(favObject.getString("foodId"));
+                                Common.currentFavRestaurant.add(fav);
+                            }
+                        }else {
+                            Common.currentFavRestaurant = new ArrayList<>();
+                        }
+                    }
+
+                }catch (Exception e){
+                    Log.e(TAG, "onResponse: ",e );
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                MyUtils.showVolleyError(error, TAG, MenuActivity.this);
+            }
+        });
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
+        MyApplication.mRequestQue.add(request);
     }
 
     private void initViews() {

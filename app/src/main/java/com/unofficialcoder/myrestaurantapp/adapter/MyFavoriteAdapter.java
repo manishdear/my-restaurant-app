@@ -97,8 +97,8 @@ public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.My
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getFoodDetails(favoriteList.get(getAdapterPosition()).getFoodId());
 
+                    getFoodDetails(favoriteList.get(getAdapterPosition()).getFoodId());
 
 //                    EventBus.getDefault().postSticky(new FoodListEvent(true, categoryList.get(getAdapterPosition())));
 //                    context.startActivity(new Intent(context, FoodListActivity.class));
@@ -109,10 +109,10 @@ public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.My
     }
 
     private void getFoodDetails(String foodId){
-        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FOOD_BY_ID+"/"+foodId, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FOOD_BY_ID+foodId, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "loadFavoriteItems: "+ response);
+                Log.d(TAG, "getFoodDetails: "+ response);
                 try {
                     JSONObject rootObject = new JSONObject(response);
                     if (rootObject.getBoolean("success")){

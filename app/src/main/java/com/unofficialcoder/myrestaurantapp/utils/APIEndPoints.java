@@ -9,6 +9,9 @@ public class APIEndPoints {
     public static final String SEARCH_FOOD = DEMO_SERVER_URL + "food/searchfood?key=1234&foodName=";
     public static final String GET_FAVORITE_FOOD = DEMO_SERVER_URL + "favorite?key=1234&fbid=2739799736047038";
     public static final String GET_FOOD_BY_ID = DEMO_SERVER_URL + "food/ById?key=1234&foodId=";
+    public static final String GET_FAV_BY_RESTAURANT = DEMO_SERVER_URL + "favorite/ByRestaurant?key=1234&fbid=2739799736047038&restaurantId=";
+    public static final String POST_ADD_TO_FAV = DEMO_SERVER_URL + "favorite";
+    public static final String DELETE_FOOD_FROM_RESTAURANT = DEMO_SERVER_URL + "favorite?key=1234&fbid=156852364&foodId=5&restaurantId=2";
 
 
 }
