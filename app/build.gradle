@@ -52,8 +52,8 @@ dependencies {
     //Retrofit + RxJava
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.7'
 
     //Spots Dialog
     implementation 'com.github.d-max:spots-dialog:1.1@arr'
@@ -61,7 +61,7 @@ dependencies {
     //Slider
     implementation 'com.ss.bannerslider:bannerslider:2.0.0'
 
-    //Google Volley
+    //Volley
     implementation 'com.android.volley:volley:1.1.1'
     // Image uploader
     implementation 'net.gotev:uploadservice:3.4.1'
@@ -77,7 +77,20 @@ dependencies {
     //Notification Badge
     implementation 'com.nex3z:notification-badge:1.0.2'
 
+    //Room + RxJava
+    annotationProcessor 'androidx.room:room-compiler:2.1.0-beta01'
+    implementation 'androidx.room:room-rxjava2:2.1.0-beta01'
+
+    //Expandable layout
+    implementation 'com.github.florent37:expansionpanel:1.2.2'
+
+    //Date Calender
+    implementation 'com.wdullaer:materialdatetimepicker:4.2.0'
+
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    //Facebook login
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
 }

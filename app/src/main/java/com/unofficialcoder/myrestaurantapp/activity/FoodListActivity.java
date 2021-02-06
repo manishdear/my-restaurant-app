@@ -107,7 +107,7 @@ public class FoodListActivity extends AppCompatActivity {
     protected void onDestroy() {
 
         if (adapter != null){
-            adapter.onStop();
+            //adapter.onStop();
         }
         if (searchAdapter != null){
             //searchAdapter.onStop();

@@ -19,6 +19,7 @@ import androidx.core.view.GravityCompat;
 
 import com.google.android.material.navigation.NavigationView;
 import com.unofficialcoder.myrestaurantapp.MyApplication;
+import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
 import com.unofficialcoder.myrestaurantapp.R;
 import com.unofficialcoder.myrestaurantapp.adapter.RestaurantAdapter;
@@ -108,7 +109,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadRestaurant(){
-        StringRequest otpRequest = new StringRequest(Request.Method.GET, "https://myresproject.herokuapp.com/restaurant?key=1234", new Response.Listener<String>() {
+        StringRequest restaurantRequest = new StringRequest(Request.Method.GET, APIEndPoints.GET_ALL_RESTAURANT, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, "onResponse: "+ response);
@@ -153,12 +154,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 return params;
             }
         };
-        otpRequest.setRetryPolicy(new DefaultRetryPolicy(
+        restaurantRequest.setRetryPolicy(new DefaultRetryPolicy(
                 30000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
-        MyApplication.mRequestQue.add(otpRequest);
+        MyApplication.mRequestQue.add(restaurantRequest);
     }
 
 

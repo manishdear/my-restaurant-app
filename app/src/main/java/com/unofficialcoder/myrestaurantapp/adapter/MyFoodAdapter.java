@@ -28,6 +28,8 @@ import com.unofficialcoder.myrestaurantapp.model.FoodBean;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,11 +85,16 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
         holder.img_fav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "onClick img_fav: "+ v.getTag());
                 if ((Boolean)v.getTag()){
-
                     // if tag = true -> Favorite item click
-                    addFoodToFavorite();
-                    removeFoodFromFavorite();
+                    removeFoodFromFavorite(bean);
+                    holder.img_fav.setImageResource(R.drawable.ic_favorite_border_primary_24dp);
+                    holder.img_fav.setTag(false);
+                }else{
+                    addFoodToFavorite(bean);
+                    holder.img_fav.setImageResource(R.drawable.ic_favorite_primary_24dp);
+                    holder.img_fav.setTag(true);
                 }
             }
         });
@@ -104,13 +111,16 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
 
     }
 
-    private void removeFoodFromFavorite() {
-        StringRequest request = new StringRequest(Request.Method.DELETE, APIEndPoints.DELETE_FOOD_FROM_RESTAURANT, new Response.Listener<String>() {
+    private void removeFoodFromFavorite(FoodBean bean) {
+        StringRequest request = new StringRequest(Request.Method.DELETE, APIEndPoints.DELETE_FOOD_FROM_RESTAURANT+bean.getId()+"&restaurantId="+Common.currentRestaurant.getId(), new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "onResponse: " + response);
+                Log.d(TAG, "removeFoodFromFavorite: " + response);
                 try {
-
+                    JSONObject rootObject = new JSONObject(response);
+                    if (rootObject.getBoolean("success")){
+                        MyUtils.showTheToastMessage(rootObject.getString("message"));
+                    }
                 }catch (Exception e){
                     Log.e(TAG, "onResponse: ",e );
                 }
@@ -129,12 +139,16 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
         MyApplication.mRequestQue.add(request);
     }
 
-    private void addFoodToFavorite() {
+    private void addFoodToFavorite(FoodBean bean) {
         StringRequest request = new StringRequest(Request.Method.POST, APIEndPoints.POST_ADD_TO_FAV, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "onResponse: "+ response);
+                Log.d(TAG, "addFoodToFavorite: "+ response);
                 try {
+                    JSONObject rootObject = new JSONObject(response);
+                    if (rootObject.getBoolean("success")){
+                        MyUtils.showTheToastMessage("Added to Favorite!");
+                    }
 
                 }catch (Exception e){
                     Log.e(TAG, "onResponse: ", e );
@@ -146,19 +160,21 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
                 MyUtils.showVolleyError(error, TAG, context);
             }
         }){
+
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("key", "1234");
-                params.put("foodId", "1234");
-                params.put("restaurantId", "1234");
-                params.put("restaurantName", "1234");
-                params.put("foodName", "1234");
-                params.put("foodImage", "1234");
-                params.put("price", "1234");
-                params.put("fbid", "1234");
+                params.put("foodId", bean.getId());
+                params.put("restaurantId", Common.currentRestaurant.getId());
+                params.put("restaurantName", Common.currentRestaurant.getName());
+                params.put("foodName", bean.getName());
+                params.put("foodImage", bean.getImage());
+                params.put("price", bean.getPrice());
+                params.put("fbid", APIEndPoints.fbid);
                 return params;
             }
+
         };
         request.setRetryPolicy(new DefaultRetryPolicy(
                 30000,
@@ -205,6 +221,12 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
                 listener.onFoodItemClickListener(v, getAdapterPosition(), false);
             }
         }
+    }
+
+    public String currentTime(){
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+        return ts;
     }
 
 

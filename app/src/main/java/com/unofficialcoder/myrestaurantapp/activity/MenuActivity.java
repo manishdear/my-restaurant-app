@@ -59,15 +59,13 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         initViews();
-
-        loadFavoriteByRestaurant();
     }
 
-    private void loadFavoriteByRestaurant() {
-        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FAV_BY_RESTAURANT, new Response.Listener<String>() {
+    private void loadFavoriteByRestaurant(String restaurantId) {
+        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FAV_BY_RESTAURANT+restaurantId, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "onResponse: "+ response);
+                Log.d(TAG, "loadFavoriteByRestaurant: "+ response);
                 try {
                     JSONObject rootObject = new JSONObject(response);
                     if (rootObject.getBoolean("success")){
@@ -178,9 +176,12 @@ public class MenuActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             adapter.notifyDataSetChanged();
 
+            loadFavoriteByRestaurant(event.getRestaurant().getId());
+
             if (categoryList.size() == 0){
 
                 loadMenu(event.getRestaurant().getId());
+
             }
 
         }else {
@@ -192,7 +193,7 @@ public class MenuActivity extends AppCompatActivity {
         StringRequest otpRequest = new StringRequest(Request.Method.GET, APIEndPoints.GET_MENU_BY_RESTAURANT_ID+id, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "onResponse: "+ response);
+                Log.d(TAG, "loadMenu: "+ response);
                 try {
                     JSONObject rootObject = new JSONObject(response);
                     if (rootObject.getBoolean("success")){

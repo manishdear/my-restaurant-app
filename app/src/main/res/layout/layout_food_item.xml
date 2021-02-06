@@ -65,7 +65,8 @@
                 android:id="@+id/img_fav"
                 android:src="@drawable/ic_favorite_border_primary_24dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:tag="false"/>
 
             <ImageView
                 android:id="@+id/img_cart"
