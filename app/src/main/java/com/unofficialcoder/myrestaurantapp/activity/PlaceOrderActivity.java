@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +28,8 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class PlaceOrderActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+
+    private static final String TAG = "PlaceOrderActivity";
 
     @BindView(R.id.edt_date)
     EditText edt_date;
@@ -86,6 +89,7 @@ public class PlaceOrderActivity extends AppCompatActivity implements DatePickerD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_order);
+
 
         init();
         initView();

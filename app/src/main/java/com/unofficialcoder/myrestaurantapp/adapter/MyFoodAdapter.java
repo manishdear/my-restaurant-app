@@ -1,6 +1,7 @@
 package com.unofficialcoder.myrestaurantapp.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,17 +23,30 @@ import com.google.android.gms.common.api.Api;
 import com.squareup.picasso.Picasso;
 import com.unofficialcoder.myrestaurantapp.MyApplication;
 import com.unofficialcoder.myrestaurantapp.R;
+import com.unofficialcoder.myrestaurantapp.Retrofit.IMyRestaurantAPI;
+import com.unofficialcoder.myrestaurantapp.Retrofit.RetrofitClient;
+import com.unofficialcoder.myrestaurantapp.activity.FoodDetailsActivity;
 import com.unofficialcoder.myrestaurantapp.common.Common;
 import com.unofficialcoder.myrestaurantapp.interfaces.FoodDetailOrCardClickListener;
 import com.unofficialcoder.myrestaurantapp.model.FoodBean;
+import com.unofficialcoder.myrestaurantapp.model.eventBus.FoodDetailEvent;
+import com.unofficialcoder.myrestaurantapp.storage.db.CartDataSource;
+import com.unofficialcoder.myrestaurantapp.storage.db.CartDatabase;
+import com.unofficialcoder.myrestaurantapp.storage.db.CartItem;
+import com.unofficialcoder.myrestaurantapp.storage.db.LocalCartDataSource;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHolder> {
 
@@ -40,10 +54,20 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
 
     Context context;
     List<FoodBean> foodList;
+    private CompositeDisposable mCompositeDisposable;
+    private CartDataSource mCartDataSource;
+    private IMyRestaurantAPI mIMyRestaurantAPI;
+
+    public void onStop() {
+        mCompositeDisposable.clear();
+    }
 
     public MyFoodAdapter(Context context, List<FoodBean> foodList) {
         this.context = context;
         this.foodList = foodList;
+        mCompositeDisposable = new CompositeDisposable();
+        mCartDataSource = new LocalCartDataSource(CartDatabase.getInstance(context).cartDAO());
+        mIMyRestaurantAPI = RetrofitClient.getInstance(Common.API_RESTAURANT_ENDPOINT).create(IMyRestaurantAPI.class);
     }
 
     @NonNull
@@ -102,9 +126,32 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
             @Override
             public void onFoodItemClickListener(View view, int position, boolean isDetail) {
                 if (isDetail){
-                    Toast.makeText(context, "Detail Click", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "Detail Click", Toast.LENGTH_SHORT).show();
+                    EventBus.getDefault().postSticky(new FoodDetailEvent(true, foodList.get(position)));
+                    context.startActivity(new Intent(context, FoodDetailsActivity.class));
                 }else {
-                    Toast.makeText(context, "Cart Click", Toast.LENGTH_SHORT).show();
+                    // Cart create
+                    CartItem cartItem = new CartItem();
+                    cartItem.setFoodId(Integer.parseInt(foodList.get(position).getId()));
+                    cartItem.setFoodName(foodList.get(position).getName());
+                    cartItem.setFoodPrice(Double.parseDouble(foodList.get(position).getPrice()));
+                    cartItem.setFoodImage(foodList.get(position).getImage());
+                    cartItem.setFoodQuantity(1);
+                    cartItem.setUserPhone(Common.currentUser.getUserPhone());
+                    cartItem.setRestaurantId(Integer.parseInt(Common.currentRestaurant.getId()));
+                    cartItem.setFoodAddon("NORMAL");
+                    cartItem.setFoodSize("NORMAL");
+                    cartItem.setFoodExtraPrice(0.0);
+                    cartItem.setFbid(Common.currentUser.getFbid());
+
+                    mCompositeDisposable.add(mCartDataSource.insertOrReplaceAll(cartItem)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(() -> {
+                                Toast.makeText(context, "Added to Cart", Toast.LENGTH_SHORT).show();
+                            }, throwable -> {
+
+                            }));
                 }
             }
         });

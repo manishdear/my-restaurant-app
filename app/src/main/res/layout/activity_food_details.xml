@@ -35,15 +35,13 @@
             android:layout_margin="4dp">
 
             <ImageView
-                android:id="@+id/img_restaurant"
+                android:id="@+id/img_food_detail"
                 android:scaleType="centerCrop"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:src="@drawable/menu_chickena"/>
 
         </androidx.cardview.widget.CardView>
-
-
 
         <androidx.cardview.widget.CardView
             android:id="@+id/food_details"
@@ -108,6 +106,7 @@
                     android:layout_height="wrap_content">
 
                     <RadioGroup
+                        android:id="@+id/rdi_group_size"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="4dp"
@@ -153,18 +152,43 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Add On"
-                        android:fontFamily="@font/magnifika"
-                        android:textSize="28sp"
-                        android:layout_margin="8dp"/>
-
-                    <Spinner
+                    <com.github.florent37.expansionpanel.ExpansionHeader
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"/>
+                        app:expansion_headerIndicator="@id/headerIndicator"
+                        app:expansion_layout="@id/expansionLayout"
+                        app:expansion_toggleOnClick="true">
+
+                        <!-- HEADER -->
+                        <TextView
+                            android:text="Add On"
+                            android:textSize="22sp"
+                            android:fontFamily="@font/magnifika"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <!-- HEADER INDICATOR -->
+                        <ImageView
+                            android:id="@+id/headerIndicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|right"
+                            android:adjustViewBounds="true"
+                            app:srcCompat="@drawable/ic_expansion_header_indicator_grey_24dp" />
+
+                    </com.github.florent37.expansionpanel.ExpansionHeader>
+
+                    <com.github.florent37.expansionpanel.ExpansionLayout
+                        android:id="@+id/expansionLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_addon"
+                            android:layout_width="match_parent"
+                            android:layout_height="300dp" />
+
+                    </com.github.florent37.expansionpanel.ExpansionLayout>
 
                 </LinearLayout>
 
@@ -176,6 +200,7 @@
                     android:layout_marginRight="8dp"/>
 
                 <TextView
+                    android:id="@+id/txt_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Description"
@@ -196,10 +221,20 @@
 
         </androidx.cardview.widget.CardView>
 
+        <Button
+            android:id="@+id/btn_view_cart"
+            android:text="View Cart"
+            android:textColor="@android:color/white"
+            android:layout_margin="8dp"
+            android:fontFamily="@font/magnifika"
+            android:background="@drawable/border_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fab_add_to_cart"
         app:layout_anchor="@id/food_details"
         app:layout_anchorGravity="top|end"
         android:layout_width="wrap_content"
@@ -207,5 +242,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@drawable/ic_shopping_cart_white_24dp"/>
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

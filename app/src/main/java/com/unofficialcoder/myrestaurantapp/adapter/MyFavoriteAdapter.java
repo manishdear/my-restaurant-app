@@ -126,8 +126,8 @@ public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.My
                                 bean.setDescription(resultObject.getString("description"));
                                 bean.setImage(resultObject.getString("image"));
                                 bean.setPrice(resultObject.getString("price"));
-                                bean.setIsSize(resultObject.getString("isSize"));
-                                bean.setIsAddon(resultObject.getString("isAddon"));
+                                bean.setSize(resultObject.getBoolean("isSize"));
+                                bean.setAddon(resultObject.getBoolean("isAddon"));
                                 bean.setDiscount(resultObject.getString("discount"));
                                 foodDetails.add(bean);
 

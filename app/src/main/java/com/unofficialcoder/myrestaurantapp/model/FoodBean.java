@@ -6,9 +6,10 @@ public class FoodBean {
             description,
             image,
             price,
-            isSize,
-            isAddon,
             discount;
+
+    private boolean isSize;
+    private boolean isAddon;
 
     public String getId() {
         return id;
@@ -50,21 +51,6 @@ public class FoodBean {
         this.price = price;
     }
 
-    public String getIsSize() {
-        return isSize;
-    }
-
-    public void setIsSize(String isSize) {
-        this.isSize = isSize;
-    }
-
-    public String getIsAddon() {
-        return isAddon;
-    }
-
-    public void setIsAddon(String isAddon) {
-        this.isAddon = isAddon;
-    }
 
     public String getDiscount() {
         return discount;
@@ -72,5 +58,21 @@ public class FoodBean {
 
     public void setDiscount(String discount) {
         this.discount = discount;
+    }
+
+    public boolean isSize() {
+        return isSize;
+    }
+
+    public void setSize(boolean size) {
+        isSize = size;
+    }
+
+    public boolean isAddon() {
+        return isAddon;
+    }
+
+    public void setAddon(boolean addon) {
+        isAddon = addon;
     }
 }

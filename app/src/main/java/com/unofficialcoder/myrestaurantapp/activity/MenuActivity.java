@@ -6,11 +6,15 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -20,7 +24,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nex3z.notificationbadge.NotificationBadge;
 import com.squareup.picasso.Picasso;
+import com.unofficialcoder.myrestaurantapp.Retrofit.IMyRestaurantAPI;
+import com.unofficialcoder.myrestaurantapp.Retrofit.RetrofitClient;
 import com.unofficialcoder.myrestaurantapp.model.FavoriteOnlyId;
+import com.unofficialcoder.myrestaurantapp.storage.db.CartDataSource;
+import com.unofficialcoder.myrestaurantapp.storage.db.CartDatabase;
+import com.unofficialcoder.myrestaurantapp.storage.db.LocalCartDataSource;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.MyApplication;
 import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
@@ -40,82 +49,125 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class MenuActivity extends AppCompatActivity {
 
     private static final String TAG = "MenuActivity";
 
-    private ImageView img_restaurant;
-    private RecyclerView recycler_category;
-    private NotificationBadge badge;
+    @BindView(R.id.img_restaurant)
+    ImageView img_restaurant;
+    @BindView(R.id.recycler_category)
+    RecyclerView recycler_category;
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.fab)
     FloatingActionButton btn_cart;
+    @BindView(R.id.badge)
+    NotificationBadge badge;
 
     MyCategoryAdapter adapter;
     List<MenuBean> categoryList;
+
+    private CartDataSource mCartDataSource;
+
+    private IMyRestaurantAPI mIMyRestaurantAPI;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private LayoutAnimationController mLayoutAnimationController;
+
+    private MyCategoryAdapter mAdapter;
+
+    @Override
+    protected void onDestroy() {
+        mCompositeDisposable.clear();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        countCartByRestaurant();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        init();
         initViews();
+
+        countCartByRestaurant();
+        loadFavoriteByRestaurant();
     }
 
-    private void loadFavoriteByRestaurant(String restaurantId) {
-        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FAV_BY_RESTAURANT+restaurantId, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "loadFavoriteByRestaurant: "+ response);
-                try {
-                    JSONObject rootObject = new JSONObject(response);
-                    if (rootObject.getBoolean("success")){
-                        Common.currentFavRestaurant = new ArrayList<>();
-                        JSONArray resultArray = rootObject.getJSONArray("result");
-                        if (resultArray.length() != 0){
-                            for (int i = 0; i < resultArray.length(); i++) {
-                                JSONObject favObject = resultArray.getJSONObject(i);
-                                FavoriteOnlyId fav = new FavoriteOnlyId();
-                                fav.setFoodId(favObject.getString("foodId"));
-                                Common.currentFavRestaurant.add(fav);
-                            }
-                        }else {
-                            Common.currentFavRestaurant = new ArrayList<>();
-                        }
+    private void countCartByRestaurant() {
+        Log.d(TAG, "countCartByRestaurant: called!!");
+        mCartDataSource.countItemInCart(Common.currentUser.getFbid(),
+                Integer.parseInt(Common.currentRestaurant.getId()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Integer>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
                     }
 
-                }catch (Exception e){
-                    Log.e(TAG, "onResponse: ",e );
-                }
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        badge.setText(String.valueOf(integer));
+                    }
 
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                MyUtils.showVolleyError(error, TAG, MenuActivity.this);
-            }
-        });
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-        MyApplication.mRequestQue.add(request);
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(MenuActivity.this, "[COUNT CART}"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void loadFavoriteByRestaurant() {
+        Log.d(TAG, "loadFavoriteByRestaurant: called!!");
+        mCompositeDisposable.add(mIMyRestaurantAPI.getFavoriteByRestaurant(Common.API_KEY,
+                Common.currentUser.getFbid(), Integer.parseInt(Common.currentRestaurant.getId()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(favoriteOnlyIdModel -> {
+
+                    if (favoriteOnlyIdModel.isSuccess()) {
+                        if (favoriteOnlyIdModel.getResult() != null && favoriteOnlyIdModel.getResult().size() > 0) {
+                            Common.currentFavOfRestaurant = favoriteOnlyIdModel.getResult();
+                        }
+                        else {
+                            Common.currentFavOfRestaurant = new ArrayList<>();
+                        }
+                    }
+                    else {
+                        Toast.makeText(this, "[GET FAVORITE]"+favoriteOnlyIdModel.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }, throwable -> {
+                    Toast.makeText(this, "[GET FAVORITE]"+throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                }));
     }
 
     private void initViews() {
-        img_restaurant = findViewById(R.id.img_restaurant);
-        recycler_category = findViewById(R.id.recycler_category);
-        badge = findViewById(R.id.badge);
-        toolbar = findViewById(R.id.toolbar);
-        btn_cart = findViewById(R.id.fab);
+
+        ButterKnife.bind(this);
+
+        mLayoutAnimationController = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_item_from_left);
 
         btn_cart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //
+                startActivity(new Intent(MenuActivity.this, CartListActivity.class));
             }
         });
-
 
         categoryList = new ArrayList<>();
         adapter = new MyCategoryAdapter(MenuActivity.this, categoryList);
@@ -140,6 +192,16 @@ public class MenuActivity extends AppCompatActivity {
         recycler_category.addItemDecoration(new SpaceItemDecoration(8));
         recycler_category.setAdapter(adapter);
     }
+
+    private void init() {
+        Log.d(TAG, "init: called!!");
+        //mDialog = new SpotsDialog.Builder().setContext(this).setCancelable(false).build();
+        mIMyRestaurantAPI = RetrofitClient.getInstance(Common.API_RESTAURANT_ENDPOINT)
+                .create(IMyRestaurantAPI.class);
+
+        mCartDataSource = new LocalCartDataSource(CartDatabase.getInstance(this).cartDAO());
+    }
+
 
     @Override
     protected void onStart() {
@@ -169,76 +231,28 @@ public class MenuActivity extends AppCompatActivity {
     public void loadMenuByRestaurant(MenuItemEvent event){
 
         if (event.isSuccess()){
-            Picasso.get().load(APIEndPoints.DEMO_IMAGE_SERVER_URL + "12_curry_mee.jpg").into(img_restaurant);
+            Picasso.get().load(event.getRestaurant().getImage()).into(img_restaurant);
             toolbar.setTitle(event.getRestaurant().getName());
+
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             adapter.notifyDataSetChanged();
 
-            loadFavoriteByRestaurant(event.getRestaurant().getId());
+            // Request Category by restaurant Id
+            mCompositeDisposable.add(mIMyRestaurantAPI.getCategories(Common.API_KEY, Integer.parseInt(event.getRestaurant().getId()))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(menuModel -> {
 
-            if (categoryList.size() == 0){
+                        mAdapter = new MyCategoryAdapter(MenuActivity.this, menuModel.getResult());
+                        recycler_category.setAdapter(mAdapter);
+                        recycler_category.setLayoutAnimation(mLayoutAnimationController);
 
-                loadMenu(event.getRestaurant().getId());
-
-            }
-
-        }else {
+                    }, throwable -> {
+                        Toast.makeText(this, "[GET CATEGORY]"+throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }));
 
         }
-    }
-
-    private void loadMenu(String id){
-        StringRequest otpRequest = new StringRequest(Request.Method.GET, APIEndPoints.GET_MENU_BY_RESTAURANT_ID+id, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "loadMenu: "+ response);
-                try {
-                    JSONObject rootObject = new JSONObject(response);
-                    if (rootObject.getBoolean("success")){
-                        JSONArray resultArray = rootObject.getJSONArray("result");
-                        if (resultArray.length() != 0){
-                            for (int i = 0; i < resultArray.length(); i++) {
-                                JSONObject resultObject = resultArray.getJSONObject(i);
-                                MenuBean bean = new MenuBean();
-                                bean.setId(resultObject.getString("id"));
-                                bean.setName(resultObject.getString("name"));
-                                bean.setDescription(resultObject.getString("description"));
-                                bean.setImage(resultObject.getString("image"));
-
-                                categoryList.add(bean);
-                            }
-                            adapter.notifyDataSetChanged();
-                        }
-                    }else{
-                        //
-                    }
-
-                }catch (Exception e){
-                    Log.e(TAG, "onResponse: "+e.toString() );
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                MyUtils.showVolleyError(error, TAG, MenuActivity.this);
-            }
-        }){
-//            @Override
-//            protected Map<String, String> getParams() {
-//                Map<String, String> params = new HashMap<>();
-//                params.put("key", "1234");
-//                params.put("restaurantId", Common.currentRestaurant.getId());
-//                return params;
-//            }
-        };
-        otpRequest.setRetryPolicy(new DefaultRetryPolicy(
-                30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-        MyApplication.mRequestQue.add(otpRequest);
     }
 }

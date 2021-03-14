@@ -2,11 +2,10 @@ package com.unofficialcoder.myrestaurantapp.model;
 
 import java.util.List;
 
-public class MenuModel {
-
+public class FavoriteOnlyIdModel {
     private boolean success;
     private String message;
-    private List<MenuBean> result;
+    private List<FavoriteOnlyId> result;
 
     public boolean isSuccess() {
         return success;
@@ -24,11 +23,11 @@ public class MenuModel {
         this.message = message;
     }
 
-    public List<MenuBean> getResult() {
+    public List<FavoriteOnlyId> getResult() {
         return result;
     }
 
-    public void setResult(List<MenuBean> result) {
+    public void setResult(List<FavoriteOnlyId> result) {
         this.result = result;
     }
 }

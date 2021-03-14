@@ -31,4 +31,8 @@
     <string name="favorite">Favorite</string>
     <string name="place_order">Place Order</string>
 
+    <string name="cart">Cart</string>
+    <string name="empty_cart">Empty Cart</string>
+    <string name="money_sign">$</string>
+
 </resources>

@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.PlaceOrderActivity"></activity>
+        <activity android:name=".activity.CartListActivity"></activity>
+        <activity android:name=".activity.PlaceOrderActivity" />
         <activity
             android:name=".activity.FoodDetailsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
