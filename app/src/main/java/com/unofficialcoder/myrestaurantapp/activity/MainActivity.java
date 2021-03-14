@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         btnSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile", "Name"));
+                //LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile", "Name"));
             }
         });
 

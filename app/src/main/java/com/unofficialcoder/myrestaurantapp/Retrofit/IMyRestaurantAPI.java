@@ -3,9 +3,13 @@ package com.unofficialcoder.myrestaurantapp.Retrofit;
 import com.unofficialcoder.myrestaurantapp.model.AddonModel;
 import com.unofficialcoder.myrestaurantapp.model.FavoriteOnlyIdModel;
 import com.unofficialcoder.myrestaurantapp.model.MenuModel;
+import com.unofficialcoder.myrestaurantapp.model.RestaurantBean;
+import com.unofficialcoder.myrestaurantapp.model.Restaurants;
 import com.unofficialcoder.myrestaurantapp.model.SizeModel;
 import com.unofficialcoder.myrestaurantapp.model.UpdateUserModel;
 import com.unofficialcoder.myrestaurantapp.model.UserModel;
+
+import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.Field;
@@ -15,6 +19,9 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface IMyRestaurantAPI {
+
+    @GET("restaurant")
+    Observable<Restaurants> getRestaurant(@Query("key") String apiKey);
 
     @GET("user")
     Observable<UserModel> getUser(@Query("key") String apiKey,

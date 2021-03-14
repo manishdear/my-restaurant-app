@@ -66,9 +66,10 @@ public class SplashScreen extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 loadFineLocation();
             }
-        }, 3000);
+        }, 1000);
     }
 
     private void loadFineLocation() {
