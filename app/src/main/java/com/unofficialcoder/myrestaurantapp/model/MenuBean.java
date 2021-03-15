@@ -2,16 +2,18 @@ package com.unofficialcoder.myrestaurantapp.model;
 
 public class MenuBean {
 
-    private String id,
+    private String
             name,
             description,
             image;
 
-    public String getId() {
+    private int id;
+
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

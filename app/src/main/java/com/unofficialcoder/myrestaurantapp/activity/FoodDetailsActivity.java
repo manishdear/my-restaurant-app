@@ -103,13 +103,13 @@ public class FoodDetailsActivity extends AppCompatActivity {
 
         fab_add_to_cart.setOnClickListener(v -> {
             CartItem cartItem = new CartItem();
-            cartItem.setFoodId(Integer.parseInt(selectedFood.getId()));
+            cartItem.setFoodId(selectedFood.getId());
             cartItem.setFoodName(selectedFood.getName());
-            cartItem.setFoodPrice(Double.parseDouble(selectedFood.getPrice()));
+            cartItem.setFoodPrice(selectedFood.getPrice());
             cartItem.setFoodImage(selectedFood.getImage());
             cartItem.setFoodQuantity(1);
             cartItem.setUserPhone(Common.currentUser.getUserPhone());
-            cartItem.setRestaurantId(Integer.parseInt(Common.currentRestaurant.getId()));
+            cartItem.setRestaurantId(Common.currentRestaurant.getId());
             cartItem.setFoodAddon(new Gson().toJson(Common.addonList));
             cartItem.setFoodSize(sizeSelected);
             cartItem.setFoodExtraPrice(extraPrice);
@@ -176,7 +176,7 @@ public class FoodDetailsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             selectedFood = event.getFood();
-            originalPrice = Double.parseDouble(event.getFood().getPrice());
+            originalPrice = event.getFood().getPrice();
 
             txt_money.setText(String.valueOf(originalPrice));
             txt_description.setText(event.getFood().getDescription());
@@ -185,7 +185,7 @@ public class FoodDetailsActivity extends AppCompatActivity {
             if (event.getFood().isSize() && event.getFood().isAddon()) {
                 // Load size and addon from server
                 mDialog.show();
-                mCompositeDisposable.add(mIMyRestaurantAPI.getSizeOfFood(Common.API_KEY, Integer.parseInt(event.getFood().getId()))
+                mCompositeDisposable.add(mIMyRestaurantAPI.getSizeOfFood(Common.API_KEY, event.getFood().getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(sizeModel -> {
@@ -194,7 +194,7 @@ public class FoodDetailsActivity extends AppCompatActivity {
 
                             // Load addon after load size
                             mDialog.show();
-                            mCompositeDisposable.add(mIMyRestaurantAPI.getAddonOfFood(Common.API_KEY, Integer.parseInt(event.getFood().getId()))
+                            mCompositeDisposable.add(mIMyRestaurantAPI.getAddonOfFood(Common.API_KEY, event.getFood().getId())
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(addonModel -> {
@@ -211,7 +211,7 @@ public class FoodDetailsActivity extends AppCompatActivity {
             } else {
                 // If food only have size
                 if (event.getFood().isSize()) {
-                    mCompositeDisposable.add(mIMyRestaurantAPI.getSizeOfFood(Common.API_KEY, Integer.parseInt(event.getFood().getId()))
+                    mCompositeDisposable.add(mIMyRestaurantAPI.getSizeOfFood(Common.API_KEY, event.getFood().getId())
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(sizeModel -> {
@@ -225,7 +225,7 @@ public class FoodDetailsActivity extends AppCompatActivity {
 
                 // If food only have  addon
                 if (event.getFood().isAddon()) {
-                    mCompositeDisposable.add(mIMyRestaurantAPI.getAddonOfFood(Common.API_KEY, Integer.parseInt(event.getFood().getId()))
+                    mCompositeDisposable.add(mIMyRestaurantAPI.getAddonOfFood(Common.API_KEY, event.getFood().getId())
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(addonModel -> {

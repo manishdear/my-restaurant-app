@@ -11,8 +11,11 @@ import com.unofficialcoder.myrestaurantapp.Retrofit.RetrofitClient;
 import com.unofficialcoder.myrestaurantapp.common.Common;
 import com.unofficialcoder.myrestaurantapp.network.MyVolley;
 import com.unofficialcoder.myrestaurantapp.storage.MySharedPreferences;
+import com.unofficialcoder.myrestaurantapp.storage.db.CartDatabase;
 
 import net.gotev.uploadservice.UploadService;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 public class MyApplication extends Application {
 
@@ -20,6 +23,9 @@ public class MyApplication extends Application {
     public static RequestQueue mRequestQue;
     public static IMyRestaurantAPI myRestaurantAPI;
     public static MySharedPreferences sharedPreferences;
+    public static CompositeDisposable compositeDisposable;
+    public static CartDatabase cartDatabase;
+
 
     @Override
     public void onCreate() {
@@ -27,7 +33,8 @@ public class MyApplication extends Application {
         mInstance = this;
         sharedPreferences = MySharedPreferences.getInstance(this);
         UploadService.NAMESPACE = BuildConfig.APPLICATION_ID;
-
+        compositeDisposable = new CompositeDisposable();
+        cartDatabase = CartDatabase.getInstance(this);
         mRequestQue = MyVolley.getInstance().getRequestQueue();
 
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -43,6 +50,5 @@ public class MyApplication extends Application {
     public static Context getAppContext() {
         return mInstance.getApplicationContext();
     }
-
 
 }

@@ -2,7 +2,7 @@ package com.unofficialcoder.myrestaurantapp.model;
 
 public class RestaurantBean {
 
-    private String id,
+    private String
             name,
             address,
             phone,
@@ -11,12 +11,13 @@ public class RestaurantBean {
             userOwner,
             image,
             paymentUrl;
+    private int id;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

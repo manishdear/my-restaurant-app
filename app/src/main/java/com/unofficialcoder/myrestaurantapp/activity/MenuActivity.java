@@ -78,14 +78,13 @@ public class MenuActivity extends AppCompatActivity {
     private CartDataSource mCartDataSource;
 
     private IMyRestaurantAPI mIMyRestaurantAPI;
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private LayoutAnimationController mLayoutAnimationController;
 
     private MyCategoryAdapter mAdapter;
 
     @Override
     protected void onDestroy() {
-        mCompositeDisposable.clear();
+        MyApplication.compositeDisposable.clear();
         super.onDestroy();
     }
 
@@ -104,13 +103,11 @@ public class MenuActivity extends AppCompatActivity {
         initViews();
 
         countCartByRestaurant();
-        loadFavoriteByRestaurant();
+        //loadFavoriteByRestaurant();
     }
 
     private void countCartByRestaurant() {
-        Log.d(TAG, "countCartByRestaurant: called!!");
-        mCartDataSource.countItemInCart(Common.currentUser.getFbid(),
-                Integer.parseInt(Common.currentRestaurant.getId()))
+        MyApplication.cartDatabase.cartDAO().countItemInCart(Common.currentUser.getFbid(), Common.currentRestaurant.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SingleObserver<Integer>() {
@@ -126,34 +123,36 @@ public class MenuActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(MenuActivity.this, "[COUNT CART}"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MenuActivity.this, "[COUNT CART}" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void loadFavoriteByRestaurant() {
         Log.d(TAG, "loadFavoriteByRestaurant: called!!");
-        mCompositeDisposable.add(mIMyRestaurantAPI.getFavoriteByRestaurant(Common.API_KEY,
-                Common.currentUser.getFbid(), Integer.parseInt(Common.currentRestaurant.getId()))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(favoriteOnlyIdModel -> {
+        MyApplication.compositeDisposable.add(
+                MyApplication.myRestaurantAPI.getFavoriteByRestaurant(Common.API_KEY,
+                        Common.currentUser.getFbid(), Common.currentRestaurant.getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(favoriteOnlyIdModel -> {
 
-                    if (favoriteOnlyIdModel.isSuccess()) {
-                        if (favoriteOnlyIdModel.getResult() != null && favoriteOnlyIdModel.getResult().size() > 0) {
-                            Common.currentFavOfRestaurant = favoriteOnlyIdModel.getResult();
-                        }
-                        else {
-                            Common.currentFavOfRestaurant = new ArrayList<>();
-                        }
-                    }
-                    else {
-                        Toast.makeText(this, "[GET FAVORITE]"+favoriteOnlyIdModel.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                            if (favoriteOnlyIdModel.isSuccess()) {
+                                if (favoriteOnlyIdModel.getResult() != null && favoriteOnlyIdModel.getResult().size() > 0) {
+                                    Common.currentFavOfRestaurant = favoriteOnlyIdModel.getResult();
+                                }
+                                else {
+                                    Common.currentFavOfRestaurant = new ArrayList<>();
+                                }
+                            }
+                            else {
+                                Toast.makeText(this, "[GET FAVORITE]"+favoriteOnlyIdModel.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
 
-                }, throwable -> {
-                    Toast.makeText(this, "[GET FAVORITE]"+throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                }));
+                        }, throwable -> {
+                            Toast.makeText(this, "[GET FAVORITE]"+throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        })
+        );
     }
 
     private void initViews() {
@@ -202,7 +201,6 @@ public class MenuActivity extends AppCompatActivity {
         mCartDataSource = new LocalCartDataSource(CartDatabase.getInstance(this).cartDAO());
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -240,7 +238,7 @@ public class MenuActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
 
             // Request Category by restaurant Id
-            mCompositeDisposable.add(mIMyRestaurantAPI.getCategories(Common.API_KEY, Integer.parseInt(event.getRestaurant().getId()))
+            MyApplication.compositeDisposable.add(mIMyRestaurantAPI.getCategories(Common.API_KEY, event.getRestaurant().getId())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(menuModel -> {

@@ -22,7 +22,7 @@ public class Common {
 
     public static Set<Addon> addonList = new HashSet<>();
 
-    public static boolean checkFavorite(String id, List<FavoriteOnlyId> currentFavRestaurant) {
+    public static boolean checkFavorite(int id, List<FavoriteOnlyId> currentFavRestaurant) {
 
         boolean result = false;
         for (FavoriteOnlyId item: currentFavRestaurant) {
@@ -36,9 +36,10 @@ public class Common {
     public static boolean checkFavorite(int id) {
         boolean result = false;
         for (FavoriteOnlyId item : currentFavOfRestaurant) {
-            if (item.getFoodId().equals(id)) {
-                result = true;
+            if (!item.getFoodId().equals(id)) {
+                continue;
             }
+            result = true;
         }
         return result;
     }

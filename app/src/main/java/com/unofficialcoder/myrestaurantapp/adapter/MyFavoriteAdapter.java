@@ -121,14 +121,14 @@ public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.My
                             for (int i = 0; i < resultArray.length(); i++) {
                                 JSONObject resultObject = resultArray.getJSONObject(i);
                                 FoodBean bean = new FoodBean();
-                                bean.setId(resultObject.getString("id"));
+                                bean.setId(resultObject.getInt("id"));
                                 bean.setName(resultObject.getString("name"));
                                 bean.setDescription(resultObject.getString("description"));
                                 bean.setImage(resultObject.getString("image"));
-                                bean.setPrice(resultObject.getString("price"));
+                                bean.setPrice(resultObject.getDouble("price"));
                                 bean.setSize(resultObject.getBoolean("isSize"));
                                 bean.setAddon(resultObject.getBoolean("isAddon"));
-                                bean.setDiscount(resultObject.getString("discount"));
+                                bean.setDiscount(resultObject.getInt("discount"));
                                 foodDetails.add(bean);
 
                                 context.startActivity(new Intent(context, FoodDetailsActivity.class));

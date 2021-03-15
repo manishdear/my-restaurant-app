@@ -1,5 +1,7 @@
 package com.unofficialcoder.myrestaurantapp.storage.db;
 
+import androidx.room.Entity;
+
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -8,9 +10,9 @@ import io.reactivex.Single;
 
 public interface CartDataSource {
 
-    Flowable<List<CartItem>> getAllCart(String fbid, String restaurantId);
+    Flowable<List<CartItem>> getAllCart(String fbid, int restaurantId);
     Single<Integer> countItemInCart(String fbid, int restaurantId);
-    Single<Long> sumPrice(String fbid, String restaurantId);
+    Single<Long> sumPrice(String fbid, int restaurantId);
     Single<CartItem> getItemInCart(String foodId, String fbid, int restaurantId);
     Completable insertOrReplaceAll(CartItem... cartItems);
     Single<Integer> updateCart(CartItem cart);

@@ -132,19 +132,19 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
                 }else {
                     // Cart create
                     CartItem cartItem = new CartItem();
-                    cartItem.setFoodId(Integer.parseInt(foodList.get(position).getId()));
+                    cartItem.setFoodId(foodList.get(position).getId());
                     cartItem.setFoodName(foodList.get(position).getName());
-                    cartItem.setFoodPrice(Double.parseDouble(foodList.get(position).getPrice()));
+                    cartItem.setFoodPrice(foodList.get(position).getPrice());
                     cartItem.setFoodImage(foodList.get(position).getImage());
                     cartItem.setFoodQuantity(1);
                     cartItem.setUserPhone(Common.currentUser.getUserPhone());
-                    cartItem.setRestaurantId(Integer.parseInt(Common.currentRestaurant.getId()));
+                    cartItem.setRestaurantId(Common.currentRestaurant.getId());
                     cartItem.setFoodAddon("NORMAL");
                     cartItem.setFoodSize("NORMAL");
                     cartItem.setFoodExtraPrice(0.0);
                     cartItem.setFbid(Common.currentUser.getFbid());
 
-                    mCompositeDisposable.add(mCartDataSource.insertOrReplaceAll(cartItem)
+                    mCompositeDisposable.add(MyApplication.cartDatabase.cartDAO().insertOrReplaceAll(cartItem)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(() -> {
@@ -212,12 +212,12 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("key", "1234");
-                params.put("foodId", bean.getId());
-                params.put("restaurantId", Common.currentRestaurant.getId());
+                params.put("foodId", bean.getId()+"");
+                params.put("restaurantId", Common.currentRestaurant.getId()+"");
                 params.put("restaurantName", Common.currentRestaurant.getName());
                 params.put("foodName", bean.getName());
                 params.put("foodImage", bean.getImage());
-                params.put("price", bean.getPrice());
+                params.put("price", bean.getPrice()+"");
                 params.put("fbid", APIEndPoints.fbid);
                 return params;
             }

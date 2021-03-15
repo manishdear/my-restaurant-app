@@ -1,23 +1,17 @@
 package com.unofficialcoder.myrestaurantapp.model;
 
 public class FoodBean {
-    private String id,
+    private String
             name,
             description,
-            image,
-            price,
-            discount;
+            image;
+
+    private double price;
+
+    private int id, discount;
 
     private boolean isSize;
     private boolean isAddon;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -43,22 +37,6 @@ public class FoodBean {
         this.image = image;
     }
 
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
-
-    public String getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(String discount) {
-        this.discount = discount;
-    }
 
     public boolean isSize() {
         return isSize;
@@ -74,5 +52,29 @@ public class FoodBean {
 
     public void setAddon(boolean addon) {
         isAddon = addon;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
     }
 }
