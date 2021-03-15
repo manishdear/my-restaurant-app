@@ -21,6 +21,7 @@ import com.unofficialcoder.myrestaurantapp.MyApplication;
 import com.unofficialcoder.myrestaurantapp.R;
 import com.unofficialcoder.myrestaurantapp.adapter.MyFavoriteAdapter;
 import com.unofficialcoder.myrestaurantapp.adapter.MyFoodAdapter;
+import com.unofficialcoder.myrestaurantapp.common.Common;
 import com.unofficialcoder.myrestaurantapp.model.FavoriteBean;
 import com.unofficialcoder.myrestaurantapp.model.FoodBean;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
@@ -31,6 +32,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class FavoriteActivity extends AppCompatActivity {
     private static final String TAG = "FavoriteActivity";
@@ -79,49 +83,66 @@ public class FavoriteActivity extends AppCompatActivity {
     }
 
     private void loadFavoriteItems(){
-        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FAVORITE_FOOD, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "loadFavoriteItems: "+ response);
-                try {
-                    JSONObject rootObject = new JSONObject(response);
-                    if (rootObject.getBoolean("success")){
-                        JSONArray resultArray = rootObject.getJSONArray("result");
-                        if (resultArray.length() != 0){
-                            for (int i = 0; i < resultArray.length(); i++) {
-                                JSONObject resultObject = resultArray.getJSONObject(i);
-                                FavoriteBean bean = new FavoriteBean();
-                                bean.setFbid(resultObject.getString("fbid"));
-                                bean.setFoodId(resultObject.getString("foodId"));
-                                bean.setRestaurantId(resultObject.getString("restaurantId"));
-                                bean.setRestaurantName(resultObject.getString("restaurantName"));
-                                bean.setFoodName(resultObject.getString("foodName"));
-                                bean.setFoodImage(resultObject.getString("foodImage"));
-                                bean.setPrice(resultObject.getString("price"));
-                                favoriteList.add(bean);
-                            }
-                            adapter.notifyDataSetChanged();
-                        }
-                    }else{
-                        //
+        Log.d(TAG, "loadFavoriteItems: " + Common.currentUser.getFbid());
+        MyApplication.compositeDisposable.add(
+                MyApplication.myRestaurantAPI.getFavoriteFood(Common.API_KEY, Common.currentUser.getFbid())
+                .subscribeOn(Schedulers.io())
+                .observeOn((AndroidSchedulers.mainThread()))
+                .subscribe(favoriteFood->{
+                    if(favoriteFood.isSuccess()){
+                        favoriteList.addAll(favoriteFood.getResult());
+                        adapter.notifyDataSetChanged();
                     }
-
-                }catch (Exception e){
-                    Log.e(TAG, "onResponse: "+e.toString() );
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                MyUtils.showVolleyError(error, TAG, FavoriteActivity.this);
-            }
-        });
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-        MyApplication.mRequestQue.add(request);
+                }, throwable -> {
+                    Log.d(TAG, "loadFavoriteItem: " + throwable.getMessage());
+                })
+        );
     }
+
+//    private void loadFavoriteItems(){
+//        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FAVORITE_FOOD, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, "loadFavoriteItems: "+ response);
+//                try {
+//                    JSONObject rootObject = new JSONObject(response);
+//                    if (rootObject.getBoolean("success")){
+//                        JSONArray resultArray = rootObject.getJSONArray("result");
+//                        if (resultArray.length() != 0){
+//                            for (int i = 0; i < resultArray.length(); i++) {
+//                                JSONObject resultObject = resultArray.getJSONObject(i);
+//                                FavoriteBean bean = new FavoriteBean();
+//                                bean.setFbid(resultObject.getString("fbid"));
+//                                bean.setFoodId(resultObject.getString("foodId"));
+//                                bean.setRestaurantId(resultObject.getString("restaurantId"));
+//                                bean.setRestaurantName(resultObject.getString("restaurantName"));
+//                                bean.setFoodName(resultObject.getString("foodName"));
+//                                bean.setFoodImage(resultObject.getString("foodImage"));
+//                                bean.setPrice(resultObject.getString("price"));
+//                                favoriteList.add(bean);
+//                            }
+//                            adapter.notifyDataSetChanged();
+//                        }
+//                    }else{
+//                        //
+//                    }
+//
+//                }catch (Exception e){
+//                    Log.e(TAG, "onResponse: "+e.toString() );
+//                }
+//
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                MyUtils.showVolleyError(error, TAG, FavoriteActivity.this);
+//            }
+//        });
+//        request.setRetryPolicy(new DefaultRetryPolicy(
+//                30000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+//        ));
+//        MyApplication.mRequestQue.add(request);
+//    }
 }

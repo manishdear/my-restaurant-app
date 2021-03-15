@@ -92,6 +92,7 @@ public class MenuActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         countCartByRestaurant();
+        loadFavoriteByRestaurant();
     }
 
     @Override
@@ -103,7 +104,7 @@ public class MenuActivity extends AppCompatActivity {
         initViews();
 
         countCartByRestaurant();
-        //loadFavoriteByRestaurant();
+        loadFavoriteByRestaurant();
     }
 
     private void countCartByRestaurant() {
@@ -129,14 +130,12 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void loadFavoriteByRestaurant() {
-        Log.d(TAG, "loadFavoriteByRestaurant: called!!");
         MyApplication.compositeDisposable.add(
                 MyApplication.myRestaurantAPI.getFavoriteByRestaurant(Common.API_KEY,
                         Common.currentUser.getFbid(), Common.currentRestaurant.getId())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(favoriteOnlyIdModel -> {
-
                             if (favoriteOnlyIdModel.isSuccess()) {
                                 if (favoriteOnlyIdModel.getResult() != null && favoriteOnlyIdModel.getResult().size() > 0) {
                                     Common.currentFavOfRestaurant = favoriteOnlyIdModel.getResult();
@@ -150,6 +149,7 @@ public class MenuActivity extends AppCompatActivity {
                             }
 
                         }, throwable -> {
+                            Log.d(TAG, "loadFavoriteByRestaurant: " + throwable.getMessage());
                             Toast.makeText(this, "[GET FAVORITE]"+throwable.getMessage(), Toast.LENGTH_SHORT).show();
                         })
         );
@@ -193,7 +193,6 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void init() {
-        Log.d(TAG, "init: called!!");
         //mDialog = new SpotsDialog.Builder().setContext(this).setCancelable(false).build();
         mIMyRestaurantAPI = RetrofitClient.getInstance(Common.API_RESTAURANT_ENDPOINT)
                 .create(IMyRestaurantAPI.class);

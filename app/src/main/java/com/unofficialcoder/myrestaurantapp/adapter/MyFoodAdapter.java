@@ -91,9 +91,8 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
         holder.text_food_price.setText("$" + bean.getPrice());
 
         //Check Favorite
-        if (Common.currentFavRestaurant != null && Common.currentFavRestaurant.size() > 0){
-
-            if (Common.checkFavorite(bean.getId(), Common.currentFavRestaurant)){
+        if (Common.currentFavOfRestaurant != null && Common.currentFavOfRestaurant.size() > 0){
+            if (Common.checkFavorite(bean.getId())){
                 holder.img_fav.setImageResource(R.drawable.ic_favorite_primary_24dp);
                 holder.img_fav.setTag(true);
             }else {
@@ -166,6 +165,7 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
                 try {
                     JSONObject rootObject = new JSONObject(response);
                     if (rootObject.getBoolean("success")){
+                        //Common.removeFavorite(bean.getId());
                         MyUtils.showTheToastMessage(rootObject.getString("message"));
                     }
                 }catch (Exception e){
@@ -218,7 +218,7 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
                 params.put("foodName", bean.getName());
                 params.put("foodImage", bean.getImage());
                 params.put("price", bean.getPrice()+"");
-                params.put("fbid", APIEndPoints.fbid);
+                params.put("fbid", Common.currentUser.getFbid());
                 return params;
             }
 

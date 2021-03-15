@@ -1,6 +1,7 @@
 package com.unofficialcoder.myrestaurantapp.Retrofit;
 
 import com.unofficialcoder.myrestaurantapp.model.AddonModel;
+import com.unofficialcoder.myrestaurantapp.model.FavoriteFood;
 import com.unofficialcoder.myrestaurantapp.model.FavoriteOnlyIdModel;
 import com.unofficialcoder.myrestaurantapp.model.Food;
 import com.unofficialcoder.myrestaurantapp.model.MenuModel;
@@ -49,7 +50,11 @@ public interface IMyRestaurantAPI {
     Observable<Food> getFoodByName(@Query("key") String apiKey,
                                  @Query("foodName") String name);
 
-    @GET("favoriteByRestaurant")
+    @GET("favorite")
+    Observable<FavoriteFood> getFavoriteFood(@Query("key") String apiKey,
+                                             @Query("fbid") String fbid);
+
+    @GET("favorite/ByRestaurant")
     Observable<FavoriteOnlyIdModel> getFavoriteByRestaurant(@Query("key") String apiKey,
                                                             @Query("fbid") String fbid,
                                                             @Query("restaurantId") int restaurantId);

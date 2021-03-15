@@ -22,21 +22,10 @@ public class Common {
 
     public static Set<Addon> addonList = new HashSet<>();
 
-    public static boolean checkFavorite(int id, List<FavoriteOnlyId> currentFavRestaurant) {
-
-        boolean result = false;
-        for (FavoriteOnlyId item: currentFavRestaurant) {
-            if (item.getFoodId().equals(id)){
-                result = true;
-            }
-        }
-        return result;
-    }
-
     public static boolean checkFavorite(int id) {
         boolean result = false;
         for (FavoriteOnlyId item : currentFavOfRestaurant) {
-            if (!item.getFoodId().equals(id)) {
+            if (!(item.getFoodId() == id)) {
                 continue;
             }
             result = true;
@@ -46,7 +35,7 @@ public class Common {
 
     public static void removeFavorite(int id) {
         for (FavoriteOnlyId item : currentFavOfRestaurant) {
-            if (item.getFoodId().equals(id)) {
+            if (item.getFoodId() == id) {
                 currentFavOfRestaurant.remove(item);
             }
         }

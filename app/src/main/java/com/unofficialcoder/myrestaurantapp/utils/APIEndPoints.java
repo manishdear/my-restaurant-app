@@ -1,7 +1,9 @@
 package com.unofficialcoder.myrestaurantapp.utils;
 
+import com.unofficialcoder.myrestaurantapp.common.Common;
+
 public class APIEndPoints {
-    public static final String fbid = "383170518961862";
+    public static final String fbid = Common.currentUser.getFbid();
     public static final String DEMO_SERVER_URL = "https://myresproject.herokuapp.com/";
     public static final String DEMO_IMAGE_SERVER_URL = "https://myresproject.herokuapp.com/assets/";
     public static final String GET_ALL_RESTAURANT = DEMO_SERVER_URL + "restaurant?key=1234";
@@ -12,7 +14,7 @@ public class APIEndPoints {
     public static final String GET_FOOD_BY_ID = DEMO_SERVER_URL + "food/ById?key=1234&foodId=";
     public static final String GET_FAV_BY_RESTAURANT = DEMO_SERVER_URL + "favorite/ByRestaurant?key=1234&fbid="+fbid+"&restaurantId=";
     public static final String POST_ADD_TO_FAV = DEMO_SERVER_URL + "favorite";
-    public static final String DELETE_FOOD_FROM_RESTAURANT = DEMO_SERVER_URL + "favorite?key=1234&fbid="+fbid+"&foodId=";
+    public static final String DELETE_FOOD_FROM_RESTAURANT = DEMO_SERVER_URL + "favorite?key=1234&fbid="+ Common.currentUser.getFbid() +"&foodId=";
 
 
 }

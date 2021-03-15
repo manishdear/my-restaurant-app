@@ -2,13 +2,13 @@ package com.unofficialcoder.myrestaurantapp.model;
 
 public class FavoriteOnlyId {
 
-    private String foodId;
+    private int foodId;
 
-    public String getFoodId() {
+    public int getFoodId() {
         return foodId;
     }
 
-    public void setFoodId(String foodId) {
+    public void setFoodId(int foodId) {
         this.foodId = foodId;
     }
 }
