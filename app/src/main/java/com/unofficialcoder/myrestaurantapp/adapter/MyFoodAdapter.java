@@ -158,77 +158,109 @@ public class MyFoodAdapter extends RecyclerView.Adapter<MyFoodAdapter.MyViewHold
     }
 
     private void removeFoodFromFavorite(FoodBean bean) {
-        StringRequest request = new StringRequest(Request.Method.DELETE, APIEndPoints.DELETE_FOOD_FROM_RESTAURANT+bean.getId()+"&restaurantId="+Common.currentRestaurant.getId(), new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "removeFoodFromFavorite: " + response);
-                try {
-                    JSONObject rootObject = new JSONObject(response);
-                    if (rootObject.getBoolean("success")){
-                        //Common.removeFavorite(bean.getId());
-                        MyUtils.showTheToastMessage(rootObject.getString("message"));
+
+        MyApplication.compositeDisposable.add(MyApplication.myRestaurantAPI.removeFoodFromFav(Common.API_KEY,
+                Common.currentUser.getFbid(), bean.getId(), Common.currentRestaurant.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(defaultResponse -> {
+                    if(defaultResponse.isSuccess()){
+                        Toast.makeText(context, defaultResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                }catch (Exception e){
-                    Log.e(TAG, "onResponse: ",e );
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                MyUtils.showVolleyError(error, TAG, context);
-            }
-        });
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                3000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-        MyApplication.mRequestQue.add(request);
+                        },
+                        throwable -> {
+                            Log.d(TAG, "removeFoodFromFavorite: " + throwable.getMessage());
+                        })
+        );
+
+//        StringRequest request = new StringRequest(Request.Method.DELETE,
+//                APIEndPoints.DELETE_FOOD_FROM_RESTAURANT+bean.getId()+"&restaurantId="+Common.currentRestaurant.getId(), new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, "removeFoodFromFavorite: " + response);
+//                try {
+//                    JSONObject rootObject = new JSONObject(response);
+//                    if (rootObject.getBoolean("success")){
+//                        //Common.removeFavorite(bean.getId());
+//                        MyUtils.showTheToastMessage(rootObject.getString("message"));
+//                    }
+//                }catch (Exception e){
+//                    Log.e(TAG, "onResponse: ",e );
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                MyUtils.showVolleyError(error, TAG, context);
+//            }
+//        });
+//        request.setRetryPolicy(new DefaultRetryPolicy(
+//                3000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+//        ));
+//        MyApplication.mRequestQue.add(request);
     }
 
     private void addFoodToFavorite(FoodBean bean) {
-        StringRequest request = new StringRequest(Request.Method.POST, APIEndPoints.POST_ADD_TO_FAV, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "addFoodToFavorite: "+ response);
-                try {
-                    JSONObject rootObject = new JSONObject(response);
-                    if (rootObject.getBoolean("success")){
-                        MyUtils.showTheToastMessage("Added to Favorite!");
-                    }
 
-                }catch (Exception e){
-                    Log.e(TAG, "onResponse: ", e );
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                MyUtils.showVolleyError(error, TAG, context);
-            }
-        }){
+        MyApplication.compositeDisposable.add(MyApplication.myRestaurantAPI.addFoodToFav(Common.API_KEY,
+                Common.currentUser.getFbid(), bean.getId(), Common.currentRestaurant.getId(),Common.currentRestaurant.getName(),bean.getName(),
+                bean.getImage(),bean.getPrice())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(defaultResponse -> {
+                            if(defaultResponse.isSuccess()){
+                                Toast.makeText(context, "Added to Favorite!", Toast.LENGTH_SHORT).show();
+                            }
+                        },
+                        throwable -> {
+                            Log.d(TAG, "addFoodToFavorite: "+ throwable.getMessage());
+                        })
+        );
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("key", "1234");
-                params.put("foodId", bean.getId()+"");
-                params.put("restaurantId", Common.currentRestaurant.getId()+"");
-                params.put("restaurantName", Common.currentRestaurant.getName());
-                params.put("foodName", bean.getName());
-                params.put("foodImage", bean.getImage());
-                params.put("price", bean.getPrice()+"");
-                params.put("fbid", Common.currentUser.getFbid());
-                return params;
-            }
-
-        };
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-        MyApplication.mRequestQue.add(request);
+//        StringRequest request = new StringRequest(Request.Method.POST, APIEndPoints.POST_ADD_TO_FAV, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, "addFoodToFavorite: "+ response);
+//                try {
+//                    JSONObject rootObject = new JSONObject(response);
+//                    if (rootObject.getBoolean("success")){
+//                        MyUtils.showTheToastMessage("Added to Favorite!");
+//                    }
+//
+//                }catch (Exception e){
+//                    Log.e(TAG, "onResponse: ", e );
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                MyUtils.showVolleyError(error, TAG, context);
+//            }
+//        }){
+//
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<>();
+//                params.put("key", "1234");
+//                params.put("foodId", bean.getId()+"");
+//                params.put("restaurantId", Common.currentRestaurant.getId()+"");
+//                params.put("restaurantName", Common.currentRestaurant.getName());
+//                params.put("foodName", bean.getName());
+//                params.put("foodImage", bean.getImage());
+//                params.put("price", bean.getPrice()+"");
+//                params.put("fbid", Common.currentUser.getFbid());
+//                return params;
+//            }
+//
+//        };
+//        request.setRetryPolicy(new DefaultRetryPolicy(
+//                30000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+//        ));
+//        MyApplication.mRequestQue.add(request);
     }
 
     @Override

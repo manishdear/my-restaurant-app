@@ -80,8 +80,6 @@ public class MenuActivity extends AppCompatActivity {
     private IMyRestaurantAPI mIMyRestaurantAPI;
     private LayoutAnimationController mLayoutAnimationController;
 
-    private MyCategoryAdapter mAdapter;
-
     @Override
     protected void onDestroy() {
         MyApplication.compositeDisposable.clear();
@@ -91,8 +89,8 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        countCartByRestaurant();
-        loadFavoriteByRestaurant();
+        //countCartByRestaurant();
+        //loadFavoriteByRestaurant();
     }
 
     @Override
@@ -189,6 +187,7 @@ public class MenuActivity extends AppCompatActivity {
 
         recycler_category.setLayoutManager(layoutManager);
         recycler_category.addItemDecoration(new SpaceItemDecoration(8));
+        //recycler_category.setLayoutAnimation(mLayoutAnimationController);
         recycler_category.setAdapter(adapter);
     }
 
@@ -234,21 +233,21 @@ public class MenuActivity extends AppCompatActivity {
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            adapter.notifyDataSetChanged();
 
             // Request Category by restaurant Id
-            MyApplication.compositeDisposable.add(mIMyRestaurantAPI.getCategories(Common.API_KEY, event.getRestaurant().getId())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(menuModel -> {
+            if(categoryList.isEmpty()){
+                MyApplication.compositeDisposable.add(mIMyRestaurantAPI.getCategories(Common.API_KEY, event.getRestaurant().getId())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(menuModel -> {
+                            categoryList.addAll(menuModel.getResult());
+                            //recycler_category.setLayoutAnimation(mLayoutAnimationController);
+                            adapter.notifyDataSetChanged();
 
-                        mAdapter = new MyCategoryAdapter(MenuActivity.this, menuModel.getResult());
-                        recycler_category.setAdapter(mAdapter);
-                        recycler_category.setLayoutAnimation(mLayoutAnimationController);
-
-                    }, throwable -> {
-                        Toast.makeText(this, "[GET CATEGORY]"+throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }));
+                        }, throwable -> {
+                            Toast.makeText(this, "[GET CATEGORY]"+throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }));
+            }
 
         }
     }

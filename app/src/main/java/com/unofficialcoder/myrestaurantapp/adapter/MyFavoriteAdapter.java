@@ -27,6 +27,7 @@ import com.unofficialcoder.myrestaurantapp.common.Common;
 import com.unofficialcoder.myrestaurantapp.model.FavoriteBean;
 import com.unofficialcoder.myrestaurantapp.model.FoodBean;
 import com.unofficialcoder.myrestaurantapp.model.MenuBean;
+import com.unofficialcoder.myrestaurantapp.model.eventBus.FoodDetailEvent;
 import com.unofficialcoder.myrestaurantapp.model.eventBus.FoodListEvent;
 import com.unofficialcoder.myrestaurantapp.utils.APIEndPoints;
 import com.unofficialcoder.myrestaurantapp.utils.MyUtils;
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.MyViewHolder> {
     private static final String TAG = "MyFavoriteAdapter";
@@ -97,65 +100,79 @@ public class MyFavoriteAdapter extends RecyclerView.Adapter<MyFavoriteAdapter.My
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     getFoodDetails(favoriteList.get(getAdapterPosition()).getFoodId());
-
 //                    EventBus.getDefault().postSticky(new FoodListEvent(true, categoryList.get(getAdapterPosition())));
 //                    context.startActivity(new Intent(context, FoodListActivity.class));
-
                 }
             });
         }
     }
 
-    private void getFoodDetails(String foodId){
-        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FOOD_BY_ID+foodId, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "getFoodDetails: "+ response);
-                try {
-                    JSONObject rootObject = new JSONObject(response);
-                    if (rootObject.getBoolean("success")){
-                        JSONArray resultArray = rootObject.getJSONArray("result");
-                        if (resultArray.length() != 0){
-                            for (int i = 0; i < resultArray.length(); i++) {
-                                JSONObject resultObject = resultArray.getJSONObject(i);
-                                FoodBean bean = new FoodBean();
-                                bean.setId(resultObject.getInt("id"));
-                                bean.setName(resultObject.getString("name"));
-                                bean.setDescription(resultObject.getString("description"));
-                                bean.setImage(resultObject.getString("image"));
-                                bean.setPrice(resultObject.getDouble("price"));
-                                bean.setSize(resultObject.getBoolean("isSize"));
-                                bean.setAddon(resultObject.getBoolean("isAddon"));
-                                bean.setDiscount(resultObject.getInt("discount"));
-                                foodDetails.add(bean);
+    private void getFoodDetails(int foodId){
 
-                                context.startActivity(new Intent(context, FoodDetailsActivity.class));
-                                //EventBus.getDefault().postSticky(new FoodDetailEvent(true, bean));
-                            }
-                        }
-                    }else{
-                        //
+        MyApplication.compositeDisposable.add(
+                MyApplication.myRestaurantAPI.getFoodByFoodId(Common.API_KEY, foodId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(food -> {
+                    if (food.isSuccess()){
+                        foodDetails.addAll(food.getResult());
+                        context.startActivity(new Intent(context, FoodDetailsActivity.class));
+                        EventBus.getDefault().postSticky(new FoodDetailEvent(true, food.getResult().get(0)));
                     }
+                        },
+                        throwable -> {
+                            Log.d(TAG, "getFoodDetails: "+throwable.getMessage());
+                        })
+        );
 
-                }catch (Exception e){
-                    Log.e(TAG, "onResponse: "+e.toString() );
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                MyUtils.showVolleyError(error, TAG, context);
-            }
-        });
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                30000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-        MyApplication.mRequestQue.add(request);
+//        StringRequest request = new StringRequest(Request.Method.GET, APIEndPoints.GET_FOOD_BY_ID+foodId, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, "getFoodDetails: "+ response);
+//                try {
+//                    JSONObject rootObject = new JSONObject(response);
+//                    if (rootObject.getBoolean("success")){
+//                        JSONArray resultArray = rootObject.getJSONArray("result");
+//                        if (resultArray.length() != 0){
+//                            for (int i = 0; i < resultArray.length(); i++) {
+//                                JSONObject resultObject = resultArray.getJSONObject(i);
+//                                FoodBean bean = new FoodBean();
+//                                bean.setId(resultObject.getInt("id"));
+//                                bean.setName(resultObject.getString("name"));
+//                                bean.setDescription(resultObject.getString("description"));
+//                                bean.setImage(resultObject.getString("image"));
+//                                bean.setPrice(resultObject.getDouble("price"));
+//                                bean.setSize(resultObject.getBoolean("isSize"));
+//                                bean.setAddon(resultObject.getBoolean("isAddon"));
+//                                bean.setDiscount(resultObject.getInt("discount"));
+//                                foodDetails.add(bean);
+//
+//                                context.startActivity(new Intent(context, FoodDetailsActivity.class));
+//                                //EventBus.getDefault().postSticky(new FoodDetailEvent(true, bean));
+//                            }
+//                        }
+//                    }else{
+//                        //
+//                    }
+//
+//                }catch (Exception e){
+//                    Log.e(TAG, "onResponse: "+e.toString() );
+//                }
+//
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                MyUtils.showVolleyError(error, TAG, context);
+//            }
+//        });
+//        request.setRetryPolicy(new DefaultRetryPolicy(
+//                30000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+//        ));
+//        MyApplication.mRequestQue.add(request);
     }
 
 }

@@ -3,12 +3,14 @@ package com.unofficialcoder.myrestaurantapp.model;
 public class FavoriteBean {
 
     private String   fbid,
-            foodId,
+
             restaurantId,
             restaurantName,
             foodName,
             foodImage,
             price;
+
+    private int foodId;
 
     public String getFbid() {
         return fbid;
@@ -18,11 +20,11 @@ public class FavoriteBean {
         this.fbid = fbid;
     }
 
-    public String getFoodId() {
+    public int getFoodId() {
         return foodId;
     }
 
-    public void setFoodId(String foodId) {
+    public void setFoodId(int foodId) {
         this.foodId = foodId;
     }
 
