@@ -1,6 +1,7 @@
 package com.unofficialcoder.myrestaurantapp.Retrofit;
 
 import com.unofficialcoder.myrestaurantapp.model.AddonModel;
+import com.unofficialcoder.myrestaurantapp.model.CreateOrderModel;
 import com.unofficialcoder.myrestaurantapp.model.DefaultResponse;
 import com.unofficialcoder.myrestaurantapp.model.FavoriteFood;
 import com.unofficialcoder.myrestaurantapp.model.FavoriteOnlyIdModel;
@@ -9,8 +10,10 @@ import com.unofficialcoder.myrestaurantapp.model.MenuModel;
 import com.unofficialcoder.myrestaurantapp.model.RestaurantBean;
 import com.unofficialcoder.myrestaurantapp.model.Restaurants;
 import com.unofficialcoder.myrestaurantapp.model.SizeModel;
+import com.unofficialcoder.myrestaurantapp.model.UpdateOrderModel;
 import com.unofficialcoder.myrestaurantapp.model.UpdateUserModel;
 import com.unofficialcoder.myrestaurantapp.model.UserModel;
+import com.unofficialcoder.myrestaurantapp.storage.db.CartItem;
 
 import java.util.List;
 
@@ -89,4 +92,24 @@ public interface IMyRestaurantAPI {
     @GET("addon")
     Observable<AddonModel> getAddonOfFood(@Query("key") String apiKey,
                                           @Query("foodId") int foodId);
+
+    @POST("order/create")
+    @FormUrlEncoded
+    Observable<CreateOrderModel> createOrder(@Field("key") String key,
+                                             @Field("orderFBID") String orderFBID,
+                                             @Field("orderPhone") String orderPhone,
+                                             @Field("orderName") String orderName,
+                                             @Field("orderAddress") String orderAddress,
+                                             @Field("orderDate") String orderDate,
+                                             @Field("restaurantId") int restaurantId,
+                                             @Field("transactionId") String transactionId,
+                                             @Field("cod") int cod,
+                                             @Field("totalPrice") Double totalPrice,
+                                             @Field("numOfItem") int numOfItem);
+
+    @POST("orderDetail/update")
+    @FormUrlEncoded
+    Observable<UpdateOrderModel> updateOrder(@Field("key") String apiKey,
+                                             @Field("orderId") String orderId,
+                                             @Field("orderDetail") String orderDetail);
 }

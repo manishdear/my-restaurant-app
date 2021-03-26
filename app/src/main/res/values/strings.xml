@@ -34,5 +34,6 @@
     <string name="cart">Cart</string>
     <string name="empty_cart">Empty Cart</string>
     <string name="money_sign">$</string>
+    <string name="your_order">Your Order</string>
 
 </resources>

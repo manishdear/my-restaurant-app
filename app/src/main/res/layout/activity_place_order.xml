@@ -8,6 +8,8 @@
     android:background="@color/browser_actions_divider_color"
     tools:context=".activity.PlaceOrderActivity">
 
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -286,5 +288,12 @@
             />
 
     </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:visibility="gone"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>
